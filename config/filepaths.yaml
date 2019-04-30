@@ -1,6 +1,0 @@
-activebrainatlas_repo_fp: "/home/alexn/brainDev/"
-activebrainatlas_repo_utilities_fp: "/home/alexn/brainDev/src/utilities/"
-atlas_data_root: "/media/alexn/BstemAtlasDataBackup/ucsd_brain/"
-
-ng_repo_path: "/home/alexn/neuroglancer_interface/"
-ng_root: "/media/alexn/BstemAtlasDataBackup/neuroglancer_volumes/"

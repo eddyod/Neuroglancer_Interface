@@ -1,27 +1,26 @@
 import os
 import sys
 
-from ng_utilities import *
+from imported_atlas_utilities import *
+from filepath_manager import *
+
 import matplotlib.pyplot as plt
 import neuroglancer
 import cv2
-
 import yaml
-filepaths_dict = yaml.load( open("../config/filepaths.yaml","r") )
 
-# sys.path.append( filepaths_dict['activebrainatlas_repo_utilities_fp'] )
+# activebrainatlas_repo_utilities_fp = '/home/alexn/brainDev/src/utilities/'
+# sys.path.append( activebrainatlas_repo_utilities_fp )
 # from utilities2015 import *
 # from registration_utilities import *
 # from annotation_utilities import *
 # from metadata import *
 # from data_manager import *
 
-NEUROGLANCER_ROOT = filepaths_dict['ng_root']
-ng_repo_path = filepaths_dict['ng_repo_path']
-
 def get_ng_params( stack ):
     # This json file contains a set of neccessary parameters for each stack
-    with open(ng_repo_path+'config/stack_parameters_ng.json','r') as file:
+    stack_param_file = os.path.join( get_json_cache_fp(), 'stack_parameters_ng.json')
+    with open( stack_param_file,'r') as file:
         stack_parameters_ng=json.load(file)
     # Return the parameters of the specified stack
     return stack_parameters_ng[stack]
@@ -37,21 +36,23 @@ def image_contour_generator( stack, detector_id, structure, use_local_alignment 
     
     if use_local_alignment:
         # Load local transformed volumes
-        str_alignment_spec = load_json(fn_vis_structures)[structure]
-        vol = DataManager.load_transformed_volume_v2(alignment_spec = str_alignment_spec, 
+#         str_alignment_spec = load_json(fn_vis_structures)[structure]
+        with open(fn_vis_structures,'r') as json_file:
+            str_alignment_spec = json.load(json_file)[structure]
+        vol = load_transformed_volume_v2(alignment_spec = str_alignment_spec, 
                                                      return_origin_instead_of_bbox = True,
                                                      structure = structure)
     else:
         # Load simple global volumes
         str_alignment_spec = load_json(fn_vis_global)
-        vol = DataManager.load_transformed_volume_v2(alignment_spec = global_alignment_spec, 
+        vol = load_transformed_volume_v2(alignment_spec = global_alignment_spec, 
                                                                     return_origin_instead_of_bbox = True,
                                                                     structure = structure)
 
 
     # Load collection of bounding boxes for every structure
     registered_atlas_structures_wrt_wholebrainXYcropped_xysecTwoCorners = \
-            load_json(os.path.join(ROOT_DIR, 'CSHL_simple_global_registration', \
+            load_json(os.path.join(os.environ['ATLAS_DATA_ROOT_DIR'], 'CSHL_simple_global_registration', \
                                     stack + '_registered_atlas_structures_wrt_wholebrainXYcropped_xysecTwoCorners.json'))
     # Load cropping box for structure. Only need the valid min and max sections though
     (_, _, secmin), (_, _, secmax) = registered_atlas_structures_wrt_wholebrainXYcropped_xysecTwoCorners[structure]
@@ -96,7 +97,7 @@ def image_contour_generator( stack, detector_id, structure, use_local_alignment 
     # LOAD prep5->prep2 cropbox
     if image_prep==5:
         # wholeslice_to_brainstem = -from_padded_to_wholeslice, from_padded_to_brainstem
-        ini_fp = os.environ['DATA_ROOTDIR']+'CSHL_data_processed/'+stack+'/operation_configs/from_padded_to_brainstem.ini'
+        ini_fp = os.environ['ATLAS_DATA_ROOT_DIR']+'CSHL_data_processed/'+stack+'/operation_configs/from_padded_to_brainstem.ini'
         with open(ini_fp,'r') as fn:
             contents_list = fn.read().split('\n')
         for line in contents_list:
@@ -104,7 +105,7 @@ def image_contour_generator( stack, detector_id, structure, use_local_alignment 
                 rostral_limit = int( line.split(' ')[2] )
             if 'dorsal_limit' in line:
                 dorsal_limit = int( line.split(' ')[2] )
-        ini_fp = os.environ['DATA_ROOTDIR']+'CSHL_data_processed/'+stack+'/operation_configs/from_padded_to_wholeslice.ini'
+        ini_fp = os.environ['ATLAS_DATA_ROOT_DIR']+'CSHL_data_processed/'+stack+'/operation_configs/from_padded_to_wholeslice.ini'
         with open(ini_fp,'r') as fn:
             contents_list = fn.read().split('\n')
         for line in contents_list:
@@ -128,11 +129,11 @@ def image_contour_generator( stack, detector_id, structure, use_local_alignment 
         y_list.append(dorsal_limit + contour_str[y][1]/32)
 
     # PLOT Structure overlayed on thumbnail image
-    sorted_fns = DataManager.load_sorted_filenames(stack=stack)[0].keys()
+    #sorted_fns = load_sorted_filenames(stack=stack)[0].keys()
     # fp = DataManager.get_image_filepath_v2(stack=stack, prep_id=5, resol='thumbnail', version='gray', fn=sorted_fns[int(len(sorted_fns)/2)])
-    img_fn = metadata_cache['sections_to_filenames'][stack][last_sec-num_valid_sections/2]
-    fp = DataManager.get_image_filepath_v2(stack=stack, prep_id=image_prep, resol='thumbnail', version='gray', fn=img_fn)
+    #img_fn = metadata_cache['sections_to_filenames'][stack][last_sec-num_valid_sections/2]
     
+    #fp = DataManager.get_image_filepath_v2(stack=stack, prep_id=image_prep, resol='thumbnail', version='gray', fn=img_fn)
 #     img = imread(fp)
 #     plt.imshow( img, cmap='gray' )
 #     plt.scatter(x_list,y_list,s=1, color='r')
@@ -312,7 +313,7 @@ def add_structure_to_neuroglancer( viewer, str_contour, structure, stack, first_
         )
         
     if save_results:
-        fp_volume_root = '/media/alexn/BstemAtlasDataBackup/neuroglancer_volumes/'+stack+'/'
+        #fp_volume_root = '/media/alexn/BstemAtlasDataBackup/neuroglancer_volumes/'+stack+'/'
         
         if human_annotation:
             fp_volume_root += 'human_annotation/'
