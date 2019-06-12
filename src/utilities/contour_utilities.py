@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import neuroglancer
 import cv2
 import yaml
+import numpy as np
 
 # activebrainatlas_repo_utilities_fp = '/home/alexn/brainDev/src/utilities/'
 # sys.path.append( activebrainatlas_repo_utilities_fp )
@@ -313,24 +314,22 @@ def add_structure_to_neuroglancer( viewer, str_contour, structure, stack, first_
         )
         
     if save_results:
-        #fp_volume_root = '/media/alexn/BstemAtlasDataBackup/neuroglancer_volumes/'+stack+'/'
+        volumes_have_offset = not no_offset_big_volume
         
-        if human_annotation:
-            fp_volume_root += 'human_annotation/'
-        else:
-            fp_volume_root += 'registration/'
-        if no_offset_big_volume:
-            fp_volume_root += 'structure_volumes_'+str(xy_ng_resolution_um)+'um/'
-            if not os.path.exists( fp_volume_root ):
-                os.makedirs(fp_volume_root)
-            np.save( fp_volume_root+structure+'_volume.npy',structure_volume)
-        else:
-            fp_volume_root += 'structure_volumes_offsets_'+str(xy_ng_resolution_um)+'um/'
-            if not os.path.exists( fp_volume_root ):
-                os.makedirs(fp_volume_root)
-            np.save( fp_volume_root+structure+'_volume.npy',structure_volume)
+        fp_volume_root = get_volume_fp( stack, precomputed=False, human_annotated=human_annotation, \
+                                  volume_type='structure', brain_crop='brainstem', xy_res=xy_ng_resolution_um, \
+                                  z_res=20, offset=volumes_have_offset, color_scheme=1, \
+                                  thickness_scheme=1, structure=structure )
+        if not os.path.exists( fp_volume_root ):
+            os.makedirs(fp_volume_root)
+            # Save volume
+        volume_fp = os.path.join( fp_volume_root, structure+'_volume.npy' )
+        np.save( volume_fp, structure_volume)
+        
+        if volumes_have_offset:
             # Save offsets
-            with open(fp_volume_root+structure+'_offsets.txt', 'w') as offset_file:
+            volume_offset_fp = os.path.join( fp_volume_root, structure+'_offset.txt' )
+            with open( volume_offset_fp, 'w') as offset_file:
                 insert_str =  str(min_x+hc_x_offset)+" "+str(min_y+hc_y_offset)+" "+str(min_z)
                 offset_file.write(  insert_str )
             offset_file.close()

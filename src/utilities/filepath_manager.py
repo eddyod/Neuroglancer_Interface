@@ -5,54 +5,6 @@ import os
 #import numpy as np
 
 
-# $NG_ROOT_DIR
-# │
-# ├── Neuroglancer_Images
-# │   ├── Precomputed
-# │   │   └── <STACK>
-# │   │       └── <STACK>_prep2_lossless_<VERSION>Jpeg_precomputed
-# │   └── Raw
-# │       └── <STACK>
-# │           └── <STACK>_prep2_lossless_<VERSION>Jpeg
-# │
-# └── Neuroglancer_Volumes
-#     ├── Precomputed
-#     │   └── <STACK>
-#     │       ├── registration
-#     │       │   ├── combined_volume
-#     │       │   │   ├── wholebrain_xy<RES>um_z<RES>um
-#     │       │   │   └── brainstem_xy<RES>um_z<RES>um
-#     │       │   └── structure_volumes
-#     │       │       ├── wholebrain_xy<RES>um_z<RES>um
-#     │       │       └── brainstem_xy<RES>um_z<RES>um
-#     │       └── human_annotation
-#     │           ├── combined_volume
-#     │           │   ├── wholebrain_xy<RES>um_z<RES>um
-#     │           │   └── brainstem_xy<RES>um_z<RES>um
-#     │           └── structure_volumes
-#     │               ├── wholebrain_xy<RES>um_z<RES>um
-#     │               └── brainstem_xy<RES>um_z<RES>um
-#     └── Matrix
-#         └── <STACK>
-#             ├── registration
-#             │   ├── combined_volume
-#             │   │   ├── wholebrain_xy<RES>um_z<RES>um
-#             │   │   └── brainstem_xy<RES>um_z<RES>um
-#             │   └── structure_volumes
-#             │       ├── wholebrain_xy<RES>um_z<RES>um
-#             │       └── brainstem_xy<RES>um_z<RES>um
-#             └── human_annotation
-#                 ├── combined_volume
-#                 │   ├── wholebrain_xy<RES>um_z<RES>um
-#                 │   └── brainstem_xy<RES>um_z<RES>um
-#                 │       └── color_<COLOR_I>_thickness_<THICKNESS_I>_offset_<OFFSET_I>
-#                 └── structure_volumes
-#                     ├── wholebrain_xy<RES>um_z<RES>um
-#                     └── brainstem_xy<RES>um_z<RES>um
-#                         └── color_<COLOR_I>_thickness_<THICKNESS_I>_offset_<OFFSET_I>
-#                             └── <STRUCTURE>
-
-
 # <VERSION> = 'gray' or 'ntbNormalizedAdaptiveInvertedGamma'
 # <STACK> = name of the stack
 # <RES> = xy5um z20um is the most common
@@ -123,7 +75,7 @@ def get_volume_fp( stack, precomputed=True, human_annotated=True, volume_type='c
     return volume_fp
 
 ## Image filepaths
-def get_image_root_fp( stack, precomputed=True, human_annotated=True ):
+def get_image_root_fp( stack, precomputed=True ):
     # Volumes are either in jpeg form (raw), or precomputed form
     if precomputed:
         image_fp_root = os.path.join( os.environ['NG_ROOT_DIR'], 'Neuroglancer_Images', \
@@ -133,8 +85,8 @@ def get_image_root_fp( stack, precomputed=True, human_annotated=True ):
                                       'Raw', stack )
     return image_fp_root
 
-def get_image_fp( stack, precomputed=True, human_annotated=True, brain_crop='brainstem', \
-                 image_version='rawJpeg', resolution='raw' ):
+def get_image_fp( stack, precomputed=True, brain_crop='brainstem', \
+                 image_version='grayJpeg', resolution='raw' ):
     '''
     Returns the full path of the neuroglancer image files you are working with.
     '''
@@ -142,18 +94,18 @@ def get_image_fp( stack, precomputed=True, human_annotated=True, brain_crop='bra
     assert image_version=='grayJpeg' or image_version=='ntbNormalizedAdaptiveInvertedGammaJpeg'
     assert resolution=='raw' or resolution=='lossless'
     
-    image_root_fp = get_image_root_fp( stack, precomputed=precomputed, human_annotated=human_annotated )
+    image_root_fp = get_image_root_fp( stack, precomputed=precomputed )
     
     if brain_crop=='brainstem':
-        brain_crop==2
+        brain_crop=2
     elif brain_crop=='wholebrain':
-        brain_crop==5
+        brain_crop=5
     
     folder_name_1 = stack+'_prep'+str(brain_crop)+'_'+resolution+'_'+image_version
     if precomputed:
         folder_name_1 = folder_name_1+'_precomputed'
         
-    image_fp = os.path.join( image_root_fp, older_name_1)+'/'
+    image_fp = os.path.join( image_root_fp, folder_name_1)+'/'
     
     return image_fp
 

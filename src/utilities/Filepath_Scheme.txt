@@ -1,0 +1,55 @@
+# $NG_ROOT_DIR
+# │
+# ├── Neuroglancer_Images
+# │   ├── Precomputed
+# │   │   └── <STACK>
+# │   │       └── <STACK>_prep2_lossless_<VERSION>Jpeg_precomputed
+# │   └── Raw
+# │       └── <STACK>
+# │           └── <STACK>_prep2_lossless_<VERSION>Jpeg
+# │
+# └── Neuroglancer_Volumes
+#     ├── Precomputed
+#     │   └── <STACK>
+#     │       ├── registration
+#     │       │   ├── combined_volume
+#     │       │   │   ├── wholebrain_xy<RES>um_z<RES>um
+#     │       │   │   └── brainstem_xy<RES>um_z<RES>um
+#     │       │   └── structure_volumes
+#     │       │       ├── wholebrain_xy<RES>um_z<RES>um
+#     │       │       └── brainstem_xy<RES>um_z<RES>um
+#     │       └── human_annotation
+#     │           ├── combined_volume
+#     │           │   ├── wholebrain_xy<RES>um_z<RES>um
+#     │           │   └── brainstem_xy<RES>um_z<RES>um
+#     │           └── structure_volumes
+#     │               ├── wholebrain_xy<RES>um_z<RES>um
+#     │               └── brainstem_xy<RES>um_z<RES>um
+#     └── Matrix
+#         └── <STACK>
+#             ├── registration
+#             │   ├── combined_volume
+#             │   │   ├── wholebrain_xy<RES>um_z<RES>um
+#             │   │   └── brainstem_xy<RES>um_z<RES>um
+#             │   └── structure_volumes
+#             │       ├── wholebrain_xy<RES>um_z<RES>um
+#             │       └── brainstem_xy<RES>um_z<RES>um
+#             └── human_annotation
+#                 ├── combined_volume
+#                 │   ├── wholebrain_xy<RES>um_z<RES>um
+#                 │   └── brainstem_xy<RES>um_z<RES>um
+#                 │       └── color_<COLOR_I>_thickness_<THICKNESS_I>_offset_<OFFSET_I>
+#                 └── structure_volumes
+#                     ├── wholebrain_xy<RES>um_z<RES>um
+#                     └── brainstem_xy<RES>um_z<RES>um
+#                         └── color_<COLOR_I>_thickness_<THICKNESS_I>_offset_<OFFSET_I>
+#                             └── <STRUCTURE>
+
+
+# <VERSION> = 'gray' or 'ntbNormalizedAdaptiveInvertedGamma'
+# <STACK> = name of the stack
+# <RES> = xy5um z20um is the most common
+# <COLOR_I>/<THICKNESS_I> = index of the color scheme and thickness scheme used
+#       - example, color_i=1 links to a specific json color mapping file.
+#       - example, thickness_i=1 links to a json file encoding contour point density / thickness
+# <OFFSET_I> = boolean. True if volume(s) has offset. False if begins at image origin (origin=[0,0,0])
