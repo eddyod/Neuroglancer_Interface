@@ -143,7 +143,7 @@ def image_contour_generator( stack, detector_id, structure, use_local_alignment 
     return str_contour, first_sec, last_sec
 
 
-
+##### this method does lots of the work
 def add_structure_to_neuroglancer( viewer, str_contour, structure, stack, first_sec, last_sec, color_radius=4, xy_ng_resolution_um=10, threshold=0.5, color=1, solid_volume=False, no_offset_big_volume=False, save_results=False, return_with_offsets=False, add_to_ng=True, human_annotation=False ):
     """
     Takes in the contours of a structure as well as the name, sections spanned by the structure, and a list of
